@@ -1,0 +1,132 @@
+import torch
+import numpy as np
+from torch.utils.data import Dataset, DataLoader
+from collections import Counter
+
+##############################################
+# TOKENIZATION & SEQUENCE PREPARATION
+##############################################
+
+# Choose your tokenization approach
+tokenization_type = "word"  # Options: "char" or "word"
+
+# Character-level tokenization function
+def char_tokenize(text):
+    """Convert text to list of characters"""
+    return list(text)
+
+# Word-level tokenization function
+def word_tokenize(text):
+    """Convert text to list of words"""
+    return text.split()
+
+# Apply tokenization based on selected approach
+if tokenization_type == "char":
+    # Character-level tokenization
+    data['tokenized'] = data['better_lyrics'].apply(char_tokenize)
+    print("Using character-level tokenization")
+else:
+    # Word-level tokenization
+    data['tokenized'] = data['better_lyrics'].apply(word_tokenize)
+    print("Using word-level tokenization")
+
+##############################################
+# BUILD VOCABULARY
+##############################################
+
+# Flatten all tokens into a single list
+all_tokens = [token for tokens in data['tokenized'] for token in tokens]
+print(f"Total tokens: {len(all_tokens)}")
+
+# Count token frequencies
+token_counts = Counter(all_tokens)
+print(f"Unique tokens: {len(token_counts)}")
+
+# Create vocabulary (keep only tokens appearing at least min_freq times)
+min_freq = 2
+vocab = ['<PAD>', '<UNK>']  # Special tokens
+vocab.extend([token for token, count in token_counts.items() if count >= min_freq])
+
+# Create token-to-index and index-to-token mappings
+token2idx = {token: idx for idx, token in enumerate(vocab)}
+idx2token = {idx: token for idx, token in enumerate(vocab)}
+
+print(f"Vocabulary size: {len(vocab)}")
+
+##############################################
+# CREATE SEQUENCES FOR LSTM
+##############################################
+
+sequence_length = 50  # Input sequence length
+step_size = 1         # Step size for sliding window
+
+def create_sequences(tokenized_text, seq_length, step):
+    """Create input-output sequences from tokenized text"""
+    sequences = []
+    targets = []
+    
+    # Convert tokens to indices, replacing rare tokens with <UNK>
+    indices = [token2idx.get(token, token2idx['<UNK>']) for token in tokenized_text]
+    
+    # Create sequences and corresponding targets
+    for i in range(0, len(indices) - seq_length, step):
+        seq = indices[i:i + seq_length]
+        target = indices[i + seq_length]
+        sequences.append(seq)
+        targets.append(target)
+    
+    return sequences, targets
+
+# Create dataset of sequences and targets
+all_sequences = []
+all_targets = []
+
+for tokens in data['tokenized']:
+    # Only use sequences that are long enough
+    if len(tokens) > sequence_length + 1:
+        seqs, tgts = create_sequences(tokens, sequence_length, step_size)
+        all_sequences.extend(seqs)
+        all_targets.extend(tgts)
+
+print(f"Total sequences: {len(all_sequences)}")
+
+##############################################
+# CREATE PYTORCH DATASET & DATALOADER
+##############################################
+
+class LyricsDataset(Dataset):
+    """PyTorch Dataset for lyrics generation"""
+    
+    def __init__(self, sequences, targets):
+        self.sequences = sequences
+        self.targets = targets
+    
+    def __len__(self):
+        return len(self.sequences)
+    
+    def __getitem__(self, idx):
+        return (
+            torch.tensor(self.sequences[idx], dtype=torch.long),
+            torch.tensor(self.targets[idx], dtype=torch.long)
+        )
+
+# Create dataset and dataloader
+dataset = LyricsDataset(all_sequences, all_targets)
+
+# Split into train and validation sets (90% train, 10% validation)
+train_size = int(0.9 * len(dataset))
+val_size = len(dataset) - train_size
+train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, val_size])
+
+# Create DataLoaders
+batch_size = 64
+train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+val_loader = DataLoader(val_dataset, batch_size=batch_size)
+
+print(f"Train batches: {len(train_loader)}, Validation batches: {len(val_loader)}")
+
+# Vocabulary size (for model creation)
+vocab_size = len(vocab)
+
+
+
