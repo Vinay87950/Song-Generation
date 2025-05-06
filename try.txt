@@ -1,0 +1,143 @@
+fördern führen inspirieren
+Project Work Natural Language Processing
+Summer 2025
+Prof. Dr. Patrick Levi
+May 2, 2025
+Start: 05.05.2025 (via Moodle)
+Deadline: 04.06.2025 23:59:59 (via Moodle)
+General
+This is the final project for the Natural Language Processing Lecture (Summer 2025).
+General Requirements
+• Your solution of this project work consists of a documentation (approx. 10-15 pages) and code
+files.
+• Your documentation must be a PDF. The use of LATEX is recommended, but not obligatory. However,
+the documentation shall be in a proper report format (see grading). Markdown files or Jupyter
+notebooks hardly fulfill good report criteria.
+• Hand in a zip file containing your documentation, the filled-in and signed declaration at the end
+of this project description for each team member, and your code.
+• Upload your complete solution until the specified deadline via Moodle.
+• Any documentation part or code parts created with AI tools must be specified, what tool was used
+and to what purpose the tool was used.
+• Plagiarism: If your solution copies contains parts copied from any resource including solutions of
+team mates (for individual parts) or of other teams, all solutions involved in the plagiarism (the
+copy and the master solution) will be graded with 5.0 (fail).
+Team Requirements
+• The following project is subdivided into two parts, a team part and an individual part. The individual part must be done individually by each team member!
+• You are free to do the whole project work individually. You do not have to work in teams.
+• You must select a team via Moodle before the start date above. Team changes are not possible
+after this date. However, you are free to decide to do the task individually at any time. Just hand
+in an individual solution.
+Abteilung Amberg: Kaiser-Wilhelm-Ring 23, 92224 Amberg,
+Tel.: (09621) 482-0, Fax: (09621) 482-4991
+Abteilung Weiden: Hetzenrichter Weg 15, 92637 Weiden i. d. OPf.,
+Tel.: (0961) 382-0, Fax: (0961) 382-2991
+Email: info@oth-aw.de | Internet: http://www.oth-aw.de
+fördern führen inspirieren
+• Therefore, please indicate the authorship in your final solution (see below, requirements on team
+authorship).
+• In case of a team breakup during the project, each team member has to hand in an individual
+solution. New teams may not be formed.
+• In case you work in a team:
+– The team size is limited to two students.
+– Every student has to hand in a complete solution (code and documentation for team part
+and individual part).
+– Please indicate the correct authorship in your documentation (e.g. ”This chapter was authored by name team member 1 and name team member 2.” for team parts). The same
+applies for code. In your code, indicate the authorship in the docstrings of your classes and
+methods.
+– In the project specification you will find which part may be done in a team and which part
+must be done invividually.
+– Grading will be individual.
+2
+fördern führen inspirieren
+Grading Criteria
+General
+• Your solution solves the task and has sufficient quality.
+• Your solution is well founded and well justified. Explain your solution in the documentation.
+• Do not limit yourself just to techniques from the lecture but also research other possible approaches to find the best way to solve the project. Include current knowledge in the field and
+the current literature
+• Your solution is efficient and effective (do the right things, do the things right).
+• Your solution exceeds the quality obtained by AI tools when they are asked to solve the task.
+• Your solution demonstrates a deep understanding of the problem.
+Code
+• Code must be written in Python (except otherwise specified)
+• Your code is well structured (packages, classes, methods, ...), easy to read, understandable, and
+there are sufficient comments in the code. Uncommented code will be down-graded.
+• In addition to comments in the code, every function must contain an appropriate docstring. You
+can follow the NumPy docstring guide: https://numpydoc.readthedocs.io/en/latest/format.
+html. Notice, a Sphinx documentation is not required.
+• As a rule of thumb: The more complex the function, the more comments are required in the code.
+• Your code is efficient, understandable, and written in a way that is not error-prone.
+• Wherever possible, use available Python packages. Restrictions might be specified in the project
+description.
+• Your code must run on the computers in the GPU lab (DC 1.07).
+Documentation
+• Your documentation presents your solution. Avoid unnecessary information in the documentation. It is not intended to be a protocol of your progress, but a result report.
+• It must be written in a way that another AI master student, who is not an expert in the field of the
+project task, could follow what you did and why you did it.
+• It must follow a scientific writing standard. Take scientific papers as a template.
+• It must be well-structured and written in proper language.
+• Tables and figures shall be on point, clear, and consise.
+• Each step in your solution must be well justified in the documentation.
+• List all your references, use a proper scientific citation standard.
+3
+fördern führen inspirieren
+Project – Medical Question Answering System
+In this project, you build an AI solution which searches texts for answer to medical expert questions.
+Specifically, your solution shall answer as many medical exam questions with Wikipedia knowledge as
+possible while complying to the following requirements:
+• Dataset 1 below contains medical exam questions. Each exam questions consists of the question
+itself and usually four options for answers. Furthermore, there is an indication of the correct answer.
+• Build a system that automatically selects the correct answer option. Find the correct answer for
+as many of these exam questions as possible.
+• To answer the question, you are only allowed to use Wikipedia pages as context information.
+• For each exam question you may use not more than 5 different Wikipedia pages. You may not
+transfer unused pages from one question to another.
+• You may use the Wikipedia search engine to check whether an article on a specific topic exists
+but you may not use texts from more than 5 different Wikipedia pages (e.g. no headlines from the
+search page, ...).
+• Please make sure to stick to Wikipedia’s rules for crawlers and never to overload their servers.
+• Any further datasets or other external data sources must not be used (no other internet pages, no
+APIs, no AI tools like ChatGPT, ...).
+• Resources are restricted to the computers in DC1.07.
+Datasets
+• Dataset 1 - MedQA-USMLE-4-options [1],
+https://huggingface.co/datasets/GBaker/MedQA-USMLE-4-options?row=9
+Project realization and hints
+Part 1
+Part 1 can be done by one student or by a team of two students. In case you work in a team of two,
+please comply with the team requirements.
+Analyze the question dataset with respect to the task at hand. Can you categorize the exam questions in
+useful categories? Different categories might require different strategies for finding the correct answer.
+Your analysis shall cover the whole exam question dataset.
+For orientation: This task should take not more than 25% of the total project working time.
+4
+fördern führen inspirieren
+Part 2
+This part must be done individually.
+Realize the question answering system based on the requirements stated above. Improve your system
+as far as possible. Document the system, relevant experiments you performed, your main insights from
+your experiments, and the performance of your solution in the report. The report must clearly describe
+the strategy used for selecting the 5 Wikipedia pages as well as the strategies applied to determine the
+correct answer from the corresponding text. This task is a challenge. Build a solution which finds the
+correct answers to as many questions as possible. Your solution must be reproducible on any DC1.07
+computer. Executing python main.py must run the whole solution, evaluate all questions, and determine the number of correctly answered questions. The results must correspond to those presented in
+the report. Provide an option to evaluate your solution on a subset of only 1000 questions.
+This task should take at least 75% of the total project working time.
+Please note that grading will be more strict than in winter due to the similarity of both tasks.
+References
+[1] Di Jin, Eileen Pan, Nassim Oufattole, Wei-Hung Weng, Hanyi Fang, and Peter Szolovits. What disease
+does this patient have? a large-scale open domain question answering dataset from medical exams.
+arXiv preprint arXiv:2009.13081, 2020.
+5
+fördern führen inspirieren
+Academic Integrity Declaration for the Project Work
+Summer 2025
+Prof. Dr. Patrick Levi
+Surname, First Name:
+Student Number:
+Academic integrity declaration for examinations
+Herewith I declare that we created this project work by ourself. Individual parts are marked in code and
+documentation correctly. I declare that I created individual parts of this project work by myself. All used
+material and references are decleared in the project work.
+Place, date, signature
+6
