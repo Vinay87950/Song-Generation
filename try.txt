@@ -141,3 +141,606 @@ documentation correctly. I declare that I created individual parts of this proje
 material and references are decleared in the project work.
 Place, date, signature
 6
+
+from datasets import load_dataset
+import pandas as pd
+
+def load_medqa_dataset(subset_size=None):
+    """
+    Load the MedQA-USMLE dataset using HuggingFace datasets
+    
+    Args:
+        subset_size: If provided, limit to this many questions
+        
+    Returns:
+        Dataset object or pandas DataFrame
+    """
+    # Load the dataset
+    dataset = load_dataset("GBaker/MedQA-USMLE-4-options")
+    
+    if subset_size is not None:
+        # Convert the dataset to a list and then to DataFrame for easier manipulation
+        data_list = list(dataset['train'])
+        df = pd.DataFrame(data_list)
+        
+        # Apply subset limit
+        if subset_size < len(df):
+            df = df.head(subset_size)
+        
+        return df
+    
+    return dataset['train']
+
+def analyze_questions(dataset):
+    """
+    Analyze questions to identify categories
+    
+    Args:
+        dataset: Dataset object or DataFrame
+        
+    Returns:
+        Dictionary with analysis results
+    """
+    # Convert to DataFrame if it's not already
+    if not isinstance(dataset, pd.DataFrame):
+        data_list = list(dataset)
+        df = pd.DataFrame(data_list)
+    else:
+        df = dataset
+    
+    # Count number of options
+    option_counts = {len(row['options']) for _, row in df.iterrows()}
+    
+    # Analyze answer distribution
+    answer_distribution = df['answer_idx'].value_counts().to_dict()
+    
+    # Analyze question length
+    df['question_length'] = df['question'].apply(len)
+    
+    # Check for meta info
+    has_meta = 'meta_info' in df.columns
+    
+    # Basic statistics
+    analysis = {
+        'total_questions': len(df),
+        'unique_option_counts': option_counts,
+        'answer_distribution': answer_distribution,
+        'avg_question_length': df['question_length'].mean(),
+        'min_question_length': df['question_length'].min(),
+        'max_question_length': df['question_length'].max(),
+        'has_meta_info': has_meta
+    }
+    
+    # If metadata exists, analyze subjects
+    if has_meta and 'subject_name' in df['meta_info'][0]:
+        subjects = [row['meta_info']['subject_name'] for _, row in df.iterrows()]
+        analysis['subject_distribution'] = pd.Series(subjects).value_counts().to_dict()
+    
+    return analysis
+
+import re
+from typing import List, Dict, Tuple, Optional
+
+class DocumentChunker:
+    """Handles the chunking of Wikipedia pages into smaller segments"""
+    
+    def __init__(self, 
+                chunk_size: int = 300, 
+                chunk_overlap: int = 50,
+                delimiter: str = '\n'):
+        """
+        Initialize the document chunker
+        
+        Args:
+            chunk_size: Target size of each chunk in words
+            chunk_overlap: Number of words to overlap between chunks
+            delimiter: Character to use for splitting text into paragraphs
+        """
+        self.chunk_size = chunk_size
+        self.chunk_overlap = chunk_overlap
+        self.delimiter = delimiter
+        
+    def _split_into_paragraphs(self, text: str) -> List[str]:
+        """Split text into paragraphs based on delimiter"""
+        paragraphs = text.split(self.delimiter)
+        # Remove empty paragraphs
+        return [p.strip() for p in paragraphs if p.strip()]
+        
+    def chunk_document(self, 
+                      doc_text: str, 
+                      doc_title: str = None) -> List[Dict[str, str]]:
+        """
+        Split document into chunks with metadata
+        
+        Args:
+            doc_text: The document text to chunk
+            doc_title: Optional title of the document
+            
+        Returns:
+            List of dictionaries containing chunks and their metadata
+        """
+        paragraphs = self._split_into_paragraphs(doc_text)
+        chunks = []
+        current_chunk = []
+        current_chunk_size = 0
+        
+        for para in paragraphs:
+            # Count words in paragraph
+            words = para.split()
+            para_size = len(words)
+            
+            # If adding this paragraph would exceed chunk size, save current chunk
+            if current_chunk_size + para_size > self.chunk_size and current_chunk:
+                chunk_text = " ".join(current_chunk)
+                chunks.append({
+                    "text": chunk_text,
+                    "source": doc_title,
+                    "word_count": current_chunk_size
+                })
+                
+                # Start next chunk, possibly with overlap from previous chunk
+                if self.chunk_overlap > 0 and current_chunk_size > self.chunk_overlap:
+                    # Get the last words for overlap
+                    overlap_text = " ".join(current_chunk[-self.chunk_overlap:])
+                    current_chunk = [overlap_text]
+                    current_chunk_size = self.chunk_overlap
+                else:
+                    current_chunk = []
+                    current_chunk_size = 0
+            
+            # Add paragraph to current chunk
+            current_chunk.append(para)
+            current_chunk_size += para_size
+        
+        # Don't forget the last chunk
+        if current_chunk:
+            chunk_text = " ".join(current_chunk)
+            chunks.append({
+                "text": chunk_text,
+                "source": doc_title,
+                "word_count": current_chunk_size
+            })
+            
+        return chunks
+    
+    def chunk_wiki_pages(self, wiki_pages: Dict[str, str]) -> List[Dict[str, str]]:
+        """
+        Chunk multiple Wikipedia pages
+        
+        Args:
+            wiki_pages: Dictionary mapping page titles to content
+            
+        Returns:
+            List of all chunks from all pages with metadata
+        """
+        all_chunks = []
+        
+        for title, content in wiki_pages.items():
+            page_chunks = self.chunk_document(content, title)
+            all_chunks.extend(page_chunks)
+            
+        return all_chunks
+
+import wikipediaapi
+import wikipedia
+import time
+import re
+import numpy as np
+import faiss
+import torch
+from tqdm import tqdm
+from sentence_transformers import SentenceTransformer
+from typing import List, Dict, Tuple, Optional
+
+from utils.chunker import DocumentChunker
+
+class WikiEmbeddingRetriever:
+    def __init__(self, 
+                model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
+                user_agent: str = 'MedicalQABot/1.0',
+                chunk_size: int = 300,
+                chunk_overlap: int = 50):
+        """
+        Initialize the Wikipedia retriever with embedding capabilities
+        
+        Args:
+            model_name: Name of the sentence-transformer model to use
+            user_agent: Custom user agent for Wikipedia API requests
+            chunk_size: Target chunk size in words
+            chunk_overlap: Number of words to overlap between chunks
+        """
+        # Wiki API setup
+        self.wiki_api = wikipediaapi.Wikipedia(
+            language='en',
+            extract_format=wikipediaapi.ExtractFormat.WIKI,
+            user_agent=user_agent
+        )
+        
+        # Rate limiting
+        self.request_delay = 1  # seconds
+        
+        # Document chunking
+        self.chunker = DocumentChunker(
+            chunk_size=chunk_size,
+            chunk_overlap=chunk_overlap
+        )
+        
+        # Load embedding model
+        print(f"Loading embedding model: {model_name}")
+        self.model = SentenceTransformer(model_name)
+        self.embedding_dim = self.model.get_sentence_embedding_dimension()
+        
+        # Initialize empty index
+        self.index = None
+        self.chunks = []
+    
+    def search_wikipedia(self, query: str, max_results: int = 5) -> List[str]:
+        """Search Wikipedia for relevant pages"""
+        try:
+            time.sleep(self.request_delay)
+            results = wikipedia.search(query, results=max_results)
+            return results
+        except Exception as e:
+            print(f"Error searching Wikipedia: {e}")
+            return []
+    
+    def get_page_content(self, page_title: str) -> Optional[str]:
+        """Get content of a Wikipedia page"""
+        try:
+            time.sleep(self.request_delay)
+            page = self.wiki_api.page(page_title)
+            if page.exists():
+                return page.text
+            return None
+        except Exception as e:
+            print(f"Error retrieving page {page_title}: {e}")
+            return None
+    
+    def retrieve_and_chunk_pages(self, question: str, options: List[str], max_pages: int = 5) -> List[Dict]:
+        """
+        Retrieve Wikipedia pages, chunk them and return all chunks
+        
+        Args:
+            question: Question text
+            options: List of answer options
+            max_pages: Maximum number of pages to retrieve
+            
+        Returns:
+            List of chunks
+        """
+        # Extract keywords from question and options
+        combined_query = question + " " + " ".join(options)
+        
+        # Search for relevant pages
+        page_titles = self.search_wikipedia(combined_query, max_results=max_pages)
+        
+        # Retrieve and store page contents
+        wiki_pages = {}
+        for title in page_titles:
+            content = self.get_page_content(title)
+            if content:
+                wiki_pages[title] = content
+        
+        # Chunk all pages
+        self.chunks = self.chunker.chunk_wiki_pages(wiki_pages)
+        
+        return self.chunks
+    
+    def build_embedding_index(self, chunks: List[Dict]) -> None:
+        """
+        Build a FAISS index from chunk embeddings
+        
+        Args:
+            chunks: List of text chunks
+        """
+        if not chunks:
+            print("No chunks to index!")
+            return
+        
+        # Extract texts from chunks
+        texts = [chunk["text"] for chunk in chunks]
+        
+        # Generate embeddings
+        print("Generating embeddings for chunks...")
+        embeddings = self.model.encode(texts, convert_to_tensor=True)
+        embeddings_np = embeddings.cpu().numpy()
+        
+        # Normalize embeddings for cosine similarity
+        faiss.normalize_L2(embeddings_np)
+        
+        # Create index
+        self.index = faiss.IndexFlatIP(self.embedding_dim)  # Inner product (cosine similarity)
+        self.index.add(embeddings_np)
+        
+        print(f"Built index with {len(chunks)} chunks")
+    
+    def retrieve_relevant_chunks(self, query: str, k: int = 5) -> List[Dict]:
+        """
+        Retrieve the k most relevant chunks for a query
+        
+        Args:
+            query: Query text
+            k: Number of chunks to retrieve
+            
+        Returns:
+            List of relevant chunks
+        """
+        if not self.index:
+            raise ValueError("Index not built! Call build_embedding_index first.")
+        
+        # Generate query embedding
+        query_embedding = self.model.encode([query], convert_to_tensor=True)
+        query_embedding_np = query_embedding.cpu().numpy()
+        
+        # Normalize query embedding
+        faiss.normalize_L2(query_embedding_np)
+        
+        # Search index
+        scores, indices = self.index.search(query_embedding_np, k=min(k, len(self.chunks)))
+        
+        # Return relevant chunks with scores
+        relevant_chunks = []
+        for i, idx in enumerate(indices[0]):
+            if idx < len(self.chunks):  # Safety check
+                chunk = self.chunks[idx].copy()
+                chunk["score"] = float(scores[0][i])
+                relevant_chunks.append(chunk)
+        
+        return relevant_chunks
+    
+    def process_question(self, question: str, options: List[str], max_pages: int = 5, top_k: int = 5) -> Dict:
+        """
+        Process a question by retrieving and chunking Wikipedia pages,
+        building an index, and retrieving relevant chunks
+        
+        Args:
+            question: Question text
+            options: List of answer options
+            max_pages: Maximum number of pages to retrieve
+            top_k: Number of chunks to retrieve per query
+            
+        Returns:
+            Dictionary with question, options, and relevant chunks
+        """
+        # Retrieve and chunk pages
+        chunks = self.retrieve_and_chunk_pages(question, options, max_pages)
+        
+        # Build index from chunks
+        self.build_embedding_index(chunks)
+        
+        # Create query for each option
+        option_queries = [f"{question} {opt}" for opt in options]
+        
+        # Get relevant chunks for each option
+        option_chunks = []
+        for query in option_queries:
+            relevant_chunks = self.retrieve_relevant_chunks(query, k=top_k)
+            option_chunks.append(relevant_chunks)
+        
+        return {
+            "question": question,
+            "options": options,
+            "option_chunks": option_chunks,
+            "all_chunks": chunks
+        }
+
+import numpy as np
+import torch
+from sentence_transformers import SentenceTransformer, util
+from typing import List, Dict, Tuple
+
+class EmbeddingQuestionAnswerer:
+    def __init__(self, model_name: str = "sentence-transformers/all-MiniLM-L6-v2"):
+        """
+        Initialize the embedding-based question answerer
+        
+        Args:
+            model_name: HuggingFace model name for sentence embeddings
+        """
+        self.model = SentenceTransformer(model_name)
+    
+    def calculate_option_scores(self, 
+                               question: str,
+                               options: List[str],
+                               option_chunks: List[List[Dict]]) -> Tuple[np.ndarray, List[Dict]]:
+        """
+        Calculate scores for each answer option based on retrieved chunks
+        
+        Args:
+            question: Question text
+            options: List of answer options
+            option_chunks: List of relevant chunks for each option
+            
+        Returns:
+            Tuple of (scores_array, list_of_supporting_evidence)
+        """
+        option_scores = []
+        supporting_evidence = []
+        
+        for i, chunks in enumerate(option_chunks):
+            # Skip if no chunks retrieved
+            if not chunks:
+                option_scores.append(0)
+                supporting_evidence.append(None)
+                continue
+                
+            # Get option and combine with question
+            option = options[i]
+            option_query = f"{question} {option}"
+            
+            # Get chunk texts and scores
+            texts = [chunk["text"] for chunk in chunks]
+            retrieval_scores = np.array([chunk["score"] for chunk in chunks])
+            
+            # Calculate semantic similarity between option_query and each chunk
+            query_embedding = self.model.encode(option_query, convert_to_tensor=True)
+            chunk_embeddings = self.model.encode(texts, convert_to_tensor=True)
+            
+            # Calculate cosine similarities
+            similarities = util.pytorch_cos_sim(query_embedding, chunk_embeddings)[0].cpu().numpy()
+            
+            # Combine retrieval scores and semantic similarities
+            combined_scores = 0.5 * retrieval_scores + 0.5 * similarities
+            
+            # Find best supporting chunk
+            best_chunk_idx = np.argmax(combined_scores)
+            best_chunk = chunks[best_chunk_idx]
+            best_chunk["relevance_score"] = float(combined_scores[best_chunk_idx])
+            
+            # Store best evidence
+            supporting_evidence.append(best_chunk)
+            
+            # Aggregate scores (using weighted average)
+            option_score = np.sum(combined_scores) / len(chunks)
+            option_scores.append(float(option_score))
+        
+        return np.array(option_scores), supporting_evidence
+    
+    def answer_question(self, 
+                       question: str,
+                       options: List[str],
+                       option_chunks: List[List[Dict]]) -> Tuple[int, np.ndarray, Dict]:
+        """
+        Answer the question by scoring each option
+        
+        Args:
+            question: Question text
+            options: List of answer options
+            option_chunks: List of relevant chunks for each option
+            
+        Returns:
+            Tuple of (predicted_index, scores, evidence_dict)
+        """
+        # Calculate option scores and get supporting evidence
+        scores, evidence = self.calculate_option_scores(question, options, option_chunks)
+        
+        # Get predicted answer index
+        predicted_idx = np.argmax(scores)
+        
+        # Create evidence dictionary 
+        evidence_dict = {
+            "predicted_evidence": evidence[predicted_idx] if predicted_idx < len(evidence) else None,
+            "all_evidence": evidence,
+        }
+        
+        return predicted_idx, scores, evidence_dict
+
+import argparse
+import os
+import time
+import json
+from tqdm import tqdm
+
+from utils.data_loader import load_medqa_dataset, analyze_questions
+from utils.wiki_retriever import WikiEmbeddingRetriever
+from models.embedding_qa import EmbeddingQuestionAnswerer
+
+def main():
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description='Medical Question Answering System')
+    parser.add_argument('--subset', type=int, default=None,
+                        help='Number of questions to evaluate (default: all)')
+    parser.add_argument('--analyze', action='store_true', 
+                        help='Perform dataset analysis only')
+    parser.add_argument('--verbose', action='store_true',
+                        help='Print detailed output during evaluation')
+    parser.add_argument('--model', type=str, default="sentence-transformers/all-MiniLM-L6-v2",
+                        help='Embedding model to use')
+    args = parser.parse_args()
+    
+    # Load the dataset
+    print(f"Loading dataset{' (subset: ' + str(args.subset) + ')' if args.subset else ''}...")
+    dataset = load_medqa_dataset(subset_size=args.subset)
+    print(f"Loaded {len(dataset)} questions.")
+    
+    # If analyze flag is set, perform analysis and exit
+    if args.analyze:
+        print("Analyzing dataset...")
+        analysis = analyze_questions(dataset)
+        print("\nAnalysis Results:")
+        for key, value in analysis.items():
+            print(f"{key}: {value}")
+        return
+    
+    # Initialize components
+    wiki_retriever = WikiEmbeddingRetriever(model_name=args.model)
+    qa_model = EmbeddingQuestionAnswerer(model_name=args.model)
+    
+    # Process questions
+    correct_count = 0
+    results = []
+    
+    print("Starting question answering...")
+    for i, row in tqdm(dataset.iterrows(), total=len(dataset)):
+        question = row['question']
+        options = [row['options']['A'], row['options']['B'], 
+                  row['options']['C'], row['options']['D']]
+        correct_idx = row['answer_idx']
+        
+        if args.verbose:
+            print(f"\nQuestion {i+1}: {question}")
+            print(f"Options: {options}")
+            print(f"Correct answer: {options[correct_idx]} (index: {correct_idx})")
+        
+        # Process question through RAG pipeline
+        question_data = wiki_retriever.process_question(question, options)
+        
+        # Answer the question
+        predicted_idx, scores, evidence = qa_model.answer_question(
+            question, 
+            options, 
+            question_data["option_chunks"]
+        )
+        
+        # Check if prediction is correct
+        is_correct = (predicted_idx == correct_idx)
+        if is_correct:
+            correct_count += 1
+            
+        if args.verbose:
+            print(f"Predicted answer: {options[predicted_idx]} (index: {predicted_idx})")
+            print(f"Scores: {scores}")
+            print(f"Correct: {is_correct}")
+            
+            # Display supporting evidence
+            if evidence["predicted_evidence"]:
+                print("\nSupporting evidence:")
+                print(f"Source: {evidence['predicted_evidence']['source']}")
+                print(f"Relevance score: {evidence['predicted_evidence']['relevance_score']:.4f}")
+                print(f"Text snippet: \"{evidence['predicted_evidence']['text'][:300]}...\"")
+        
+        # Store results with evidence
+        results.append({
+            "question": question,
+            "options": options,
+            "correct_idx": int(correct_idx),
+            "predicted_idx": int(predicted_idx),
+            "scores": scores.tolist(),
+            "is_correct": bool(is_correct),
+            "evidence": {
+                "source": evidence["predicted_evidence"]["source"] if evidence["predicted_evidence"] else None,
+                "text": evidence["predicted_evidence"]["text"][:500] if evidence["predicted_evidence"] else None,
+                "relevance_score": evidence["predicted_evidence"]["relevance_score"] if evidence["predicted_evidence"] else None
+            }
+        })
+    
+    # Calculate accuracy
+    accuracy = correct_count / len(dataset)
+    print(f"\nEvaluation Results:")
+    print(f"Total questions: {len(dataset)}")
+    print(f"Correctly answered: {correct_count}")
+    print(f"Accuracy: {accuracy:.4f} ({correct_count}/{len(dataset)})")
+    
+    # Save results
+    os.makedirs("results", exist_ok=True)
+    with open("results/qa_results.json", "w") as f:
+        json.dump({
+            "accuracy": accuracy,
+            "correct_count": correct_count,
+            "total_questions": len(dataset),
+            "model": args.model,
+            "results": results
+        }, f)
+
+if __name__ == "__main__":
+    main()
