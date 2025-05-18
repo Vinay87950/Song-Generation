@@ -1,746 +1,158 @@
-fördern führen inspirieren
-Project Work Natural Language Processing
-Summer 2025
-Prof. Dr. Patrick Levi
-May 2, 2025
-Start: 05.05.2025 (via Moodle)
-Deadline: 04.06.2025 23:59:59 (via Moodle)
-General
-This is the final project for the Natural Language Processing Lecture (Summer 2025).
-General Requirements
-• Your solution of this project work consists of a documentation (approx. 10-15 pages) and code
-files.
-• Your documentation must be a PDF. The use of LATEX is recommended, but not obligatory. However,
-the documentation shall be in a proper report format (see grading). Markdown files or Jupyter
-notebooks hardly fulfill good report criteria.
-• Hand in a zip file containing your documentation, the filled-in and signed declaration at the end
-of this project description for each team member, and your code.
-• Upload your complete solution until the specified deadline via Moodle.
-• Any documentation part or code parts created with AI tools must be specified, what tool was used
-and to what purpose the tool was used.
-• Plagiarism: If your solution copies contains parts copied from any resource including solutions of
-team mates (for individual parts) or of other teams, all solutions involved in the plagiarism (the
-copy and the master solution) will be graded with 5.0 (fail).
-Team Requirements
-• The following project is subdivided into two parts, a team part and an individual part. The individual part must be done individually by each team member!
-• You are free to do the whole project work individually. You do not have to work in teams.
-• You must select a team via Moodle before the start date above. Team changes are not possible
-after this date. However, you are free to decide to do the task individually at any time. Just hand
-in an individual solution.
-Abteilung Amberg: Kaiser-Wilhelm-Ring 23, 92224 Amberg,
-Tel.: (09621) 482-0, Fax: (09621) 482-4991
-Abteilung Weiden: Hetzenrichter Weg 15, 92637 Weiden i. d. OPf.,
-Tel.: (0961) 382-0, Fax: (0961) 382-2991
-Email: info@oth-aw.de | Internet: http://www.oth-aw.de
-fördern führen inspirieren
-• Therefore, please indicate the authorship in your final solution (see below, requirements on team
-authorship).
-• In case of a team breakup during the project, each team member has to hand in an individual
-solution. New teams may not be formed.
-• In case you work in a team:
-– The team size is limited to two students.
-– Every student has to hand in a complete solution (code and documentation for team part
-and individual part).
-– Please indicate the correct authorship in your documentation (e.g. ”This chapter was authored by name team member 1 and name team member 2.” for team parts). The same
-applies for code. In your code, indicate the authorship in the docstrings of your classes and
-methods.
-– In the project specification you will find which part may be done in a team and which part
-must be done invividually.
-– Grading will be individual.
-2
-fördern führen inspirieren
-Grading Criteria
-General
-• Your solution solves the task and has sufficient quality.
-• Your solution is well founded and well justified. Explain your solution in the documentation.
-• Do not limit yourself just to techniques from the lecture but also research other possible approaches to find the best way to solve the project. Include current knowledge in the field and
-the current literature
-• Your solution is efficient and effective (do the right things, do the things right).
-• Your solution exceeds the quality obtained by AI tools when they are asked to solve the task.
-• Your solution demonstrates a deep understanding of the problem.
-Code
-• Code must be written in Python (except otherwise specified)
-• Your code is well structured (packages, classes, methods, ...), easy to read, understandable, and
-there are sufficient comments in the code. Uncommented code will be down-graded.
-• In addition to comments in the code, every function must contain an appropriate docstring. You
-can follow the NumPy docstring guide: https://numpydoc.readthedocs.io/en/latest/format.
-html. Notice, a Sphinx documentation is not required.
-• As a rule of thumb: The more complex the function, the more comments are required in the code.
-• Your code is efficient, understandable, and written in a way that is not error-prone.
-• Wherever possible, use available Python packages. Restrictions might be specified in the project
-description.
-• Your code must run on the computers in the GPU lab (DC 1.07).
-Documentation
-• Your documentation presents your solution. Avoid unnecessary information in the documentation. It is not intended to be a protocol of your progress, but a result report.
-• It must be written in a way that another AI master student, who is not an expert in the field of the
-project task, could follow what you did and why you did it.
-• It must follow a scientific writing standard. Take scientific papers as a template.
-• It must be well-structured and written in proper language.
-• Tables and figures shall be on point, clear, and consise.
-• Each step in your solution must be well justified in the documentation.
-• List all your references, use a proper scientific citation standard.
-3
-fördern führen inspirieren
-Project – Medical Question Answering System
-In this project, you build an AI solution which searches texts for answer to medical expert questions.
-Specifically, your solution shall answer as many medical exam questions with Wikipedia knowledge as
-possible while complying to the following requirements:
-• Dataset 1 below contains medical exam questions. Each exam questions consists of the question
-itself and usually four options for answers. Furthermore, there is an indication of the correct answer.
-• Build a system that automatically selects the correct answer option. Find the correct answer for
-as many of these exam questions as possible.
-• To answer the question, you are only allowed to use Wikipedia pages as context information.
-• For each exam question you may use not more than 5 different Wikipedia pages. You may not
-transfer unused pages from one question to another.
-• You may use the Wikipedia search engine to check whether an article on a specific topic exists
-but you may not use texts from more than 5 different Wikipedia pages (e.g. no headlines from the
-search page, ...).
-• Please make sure to stick to Wikipedia’s rules for crawlers and never to overload their servers.
-• Any further datasets or other external data sources must not be used (no other internet pages, no
-APIs, no AI tools like ChatGPT, ...).
-• Resources are restricted to the computers in DC1.07.
-Datasets
-• Dataset 1 - MedQA-USMLE-4-options [1],
-https://huggingface.co/datasets/GBaker/MedQA-USMLE-4-options?row=9
-Project realization and hints
-Part 1
-Part 1 can be done by one student or by a team of two students. In case you work in a team of two,
-please comply with the team requirements.
-Analyze the question dataset with respect to the task at hand. Can you categorize the exam questions in
-useful categories? Different categories might require different strategies for finding the correct answer.
-Your analysis shall cover the whole exam question dataset.
-For orientation: This task should take not more than 25% of the total project working time.
-4
-fördern führen inspirieren
-Part 2
-This part must be done individually.
-Realize the question answering system based on the requirements stated above. Improve your system
-as far as possible. Document the system, relevant experiments you performed, your main insights from
-your experiments, and the performance of your solution in the report. The report must clearly describe
-the strategy used for selecting the 5 Wikipedia pages as well as the strategies applied to determine the
-correct answer from the corresponding text. This task is a challenge. Build a solution which finds the
-correct answers to as many questions as possible. Your solution must be reproducible on any DC1.07
-computer. Executing python main.py must run the whole solution, evaluate all questions, and determine the number of correctly answered questions. The results must correspond to those presented in
-the report. Provide an option to evaluate your solution on a subset of only 1000 questions.
-This task should take at least 75% of the total project working time.
-Please note that grading will be more strict than in winter due to the similarity of both tasks.
-References
-[1] Di Jin, Eileen Pan, Nassim Oufattole, Wei-Hung Weng, Hanyi Fang, and Peter Szolovits. What disease
-does this patient have? a large-scale open domain question answering dataset from medical exams.
-arXiv preprint arXiv:2009.13081, 2020.
-5
-fördern führen inspirieren
-Academic Integrity Declaration for the Project Work
-Summer 2025
-Prof. Dr. Patrick Levi
-Surname, First Name:
-Student Number:
-Academic integrity declaration for examinations
-Herewith I declare that we created this project work by ourself. Individual parts are marked in code and
-documentation correctly. I declare that I created individual parts of this project work by myself. All used
-material and references are decleared in the project work.
-Place, date, signature
-6
-
-from datasets import load_dataset
 import pandas as pd
-
-def load_medqa_dataset(subset_size=None):
-    """
-    Load the MedQA-USMLE dataset using HuggingFace datasets
-    
-    Args:
-        subset_size: If provided, limit to this many questions
-        
-    Returns:
-        Dataset object or pandas DataFrame
-    """
-    # Load the dataset
-    dataset = load_dataset("GBaker/MedQA-USMLE-4-options")
-    
-    if subset_size is not None:
-        # Convert the dataset to a list and then to DataFrame for easier manipulation
-        data_list = list(dataset['train'])
-        df = pd.DataFrame(data_list)
-        
-        # Apply subset limit
-        if subset_size < len(df):
-            df = df.head(subset_size)
-        
-        return df
-    
-    return dataset['train']
-
-def analyze_questions(dataset):
-    """
-    Analyze questions to identify categories
-    
-    Args:
-        dataset: Dataset object or DataFrame
-        
-    Returns:
-        Dictionary with analysis results
-    """
-    # Convert to DataFrame if it's not already
-    if not isinstance(dataset, pd.DataFrame):
-        data_list = list(dataset)
-        df = pd.DataFrame(data_list)
-    else:
-        df = dataset
-    
-    # Count number of options
-    option_counts = {len(row['options']) for _, row in df.iterrows()}
-    
-    # Analyze answer distribution
-    answer_distribution = df['answer_idx'].value_counts().to_dict()
-    
-    # Analyze question length
-    df['question_length'] = df['question'].apply(len)
-    
-    # Check for meta info
-    has_meta = 'meta_info' in df.columns
-    
-    # Basic statistics
-    analysis = {
-        'total_questions': len(df),
-        'unique_option_counts': option_counts,
-        'answer_distribution': answer_distribution,
-        'avg_question_length': df['question_length'].mean(),
-        'min_question_length': df['question_length'].min(),
-        'max_question_length': df['question_length'].max(),
-        'has_meta_info': has_meta
-    }
-    
-    # If metadata exists, analyze subjects
-    if has_meta and 'subject_name' in df['meta_info'][0]:
-        subjects = [row['meta_info']['subject_name'] for _, row in df.iterrows()]
-        analysis['subject_distribution'] = pd.Series(subjects).value_counts().to_dict()
-    
-    return analysis
-
-import re
-from typing import List, Dict, Tuple, Optional
-
-class DocumentChunker:
-    """Handles the chunking of Wikipedia pages into smaller segments"""
-    
-    def __init__(self, 
-                chunk_size: int = 300, 
-                chunk_overlap: int = 50,
-                delimiter: str = '\n'):
-        """
-        Initialize the document chunker
-        
-        Args:
-            chunk_size: Target size of each chunk in words
-            chunk_overlap: Number of words to overlap between chunks
-            delimiter: Character to use for splitting text into paragraphs
-        """
-        self.chunk_size = chunk_size
-        self.chunk_overlap = chunk_overlap
-        self.delimiter = delimiter
-        
-    def _split_into_paragraphs(self, text: str) -> List[str]:
-        """Split text into paragraphs based on delimiter"""
-        paragraphs = text.split(self.delimiter)
-        # Remove empty paragraphs
-        return [p.strip() for p in paragraphs if p.strip()]
-        
-    def chunk_document(self, 
-                      doc_text: str, 
-                      doc_title: str = None) -> List[Dict[str, str]]:
-        """
-        Split document into chunks with metadata
-        
-        Args:
-            doc_text: The document text to chunk
-            doc_title: Optional title of the document
-            
-        Returns:
-            List of dictionaries containing chunks and their metadata
-        """
-        paragraphs = self._split_into_paragraphs(doc_text)
-        chunks = []
-        current_chunk = []
-        current_chunk_size = 0
-        
-        for para in paragraphs:
-            # Count words in paragraph
-            words = para.split()
-            para_size = len(words)
-            
-            # If adding this paragraph would exceed chunk size, save current chunk
-            if current_chunk_size + para_size > self.chunk_size and current_chunk:
-                chunk_text = " ".join(current_chunk)
-                chunks.append({
-                    "text": chunk_text,
-                    "source": doc_title,
-                    "word_count": current_chunk_size
-                })
-                
-                # Start next chunk, possibly with overlap from previous chunk
-                if self.chunk_overlap > 0 and current_chunk_size > self.chunk_overlap:
-                    # Get the last words for overlap
-                    overlap_text = " ".join(current_chunk[-self.chunk_overlap:])
-                    current_chunk = [overlap_text]
-                    current_chunk_size = self.chunk_overlap
-                else:
-                    current_chunk = []
-                    current_chunk_size = 0
-            
-            # Add paragraph to current chunk
-            current_chunk.append(para)
-            current_chunk_size += para_size
-        
-        # Don't forget the last chunk
-        if current_chunk:
-            chunk_text = " ".join(current_chunk)
-            chunks.append({
-                "text": chunk_text,
-                "source": doc_title,
-                "word_count": current_chunk_size
-            })
-            
-        return chunks
-    
-    def chunk_wiki_pages(self, wiki_pages: Dict[str, str]) -> List[Dict[str, str]]:
-        """
-        Chunk multiple Wikipedia pages
-        
-        Args:
-            wiki_pages: Dictionary mapping page titles to content
-            
-        Returns:
-            List of all chunks from all pages with metadata
-        """
-        all_chunks = []
-        
-        for title, content in wiki_pages.items():
-            page_chunks = self.chunk_document(content, title)
-            all_chunks.extend(page_chunks)
-            
-        return all_chunks
-
-import wikipediaapi
-import wikipedia
-import time
-import re
 import numpy as np
-import faiss
-import torch
-from tqdm import tqdm
+from datasets import load_dataset
 from sentence_transformers import SentenceTransformer
-from typing import List, Dict, Tuple, Optional
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.cluster import AgglomerativeClustering
+from sklearn.manifold import TSNE
+import matplotlib.pyplot as plt
+import seaborn as sns
+from bertopic import BERTopic
+import hdbscan
+import umap
+import warnings
+warnings.filterwarnings('ignore')
 
-from utils.chunker import DocumentChunker
+def load_medqa_dataset():
+    """Load the MedQA-USMLE dataset and convert to pandas DataFrame"""
+    dataset = load_dataset("GBaker/MedQA-USMLE-4-options")
+    df = pd.DataFrame(dataset["train"])
+    print(f"Loaded dataset with {len(df)} questions")
+    return df
 
-class WikiEmbeddingRetriever:
-    def __init__(self, 
-                model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
-                user_agent: str = 'MedicalQABot/1.0',
-                chunk_size: int = 300,
-                chunk_overlap: int = 50):
-        """
-        Initialize the Wikipedia retriever with embedding capabilities
-        
-        Args:
-            model_name: Name of the sentence-transformer model to use
-            user_agent: Custom user agent for Wikipedia API requests
-            chunk_size: Target chunk size in words
-            chunk_overlap: Number of words to overlap between chunks
-        """
-        # Wiki API setup
-        self.wiki_api = wikipediaapi.Wikipedia(
-            language='en',
-            extract_format=wikipediaapi.ExtractFormat.WIKI,
-            user_agent=user_agent
-        )
-        
-        # Rate limiting
-        self.request_delay = 1  # seconds
-        
-        # Document chunking
-        self.chunker = DocumentChunker(
-            chunk_size=chunk_size,
-            chunk_overlap=chunk_overlap
-        )
-        
-        # Load embedding model
-        print(f"Loading embedding model: {model_name}")
-        self.model = SentenceTransformer(model_name)
-        self.embedding_dim = self.model.get_sentence_embedding_dimension()
-        
-        # Initialize empty index
-        self.index = None
-        self.chunks = []
-    
-    def search_wikipedia(self, query: str, max_results: int = 5) -> List[str]:
-        """Search Wikipedia for relevant pages"""
-        try:
-            time.sleep(self.request_delay)
-            results = wikipedia.search(query, results=max_results)
-            return results
-        except Exception as e:
-            print(f"Error searching Wikipedia: {e}")
-            return []
-    
-    def get_page_content(self, page_title: str) -> Optional[str]:
-        """Get content of a Wikipedia page"""
-        try:
-            time.sleep(self.request_delay)
-            page = self.wiki_api.page(page_title)
-            if page.exists():
-                return page.text
-            return None
-        except Exception as e:
-            print(f"Error retrieving page {page_title}: {e}")
-            return None
-    
-    def retrieve_and_chunk_pages(self, question: str, options: List[str], max_pages: int = 5) -> List[Dict]:
-        """
-        Retrieve Wikipedia pages, chunk them and return all chunks
-        
-        Args:
-            question: Question text
-            options: List of answer options
-            max_pages: Maximum number of pages to retrieve
-            
-        Returns:
-            List of chunks
-        """
-        # Extract keywords from question and options
-        combined_query = question + " " + " ".join(options)
-        
-        # Search for relevant pages
-        page_titles = self.search_wikipedia(combined_query, max_results=max_pages)
-        
-        # Retrieve and store page contents
-        wiki_pages = {}
-        for title in page_titles:
-            content = self.get_page_content(title)
-            if content:
-                wiki_pages[title] = content
-        
-        # Chunk all pages
-        self.chunks = self.chunker.chunk_wiki_pages(wiki_pages)
-        
-        return self.chunks
-    
-    def build_embedding_index(self, chunks: List[Dict]) -> None:
-        """
-        Build a FAISS index from chunk embeddings
-        
-        Args:
-            chunks: List of text chunks
-        """
-        if not chunks:
-            print("No chunks to index!")
-            return
-        
-        # Extract texts from chunks
-        texts = [chunk["text"] for chunk in chunks]
-        
-        # Generate embeddings
-        print("Generating embeddings for chunks...")
-        embeddings = self.model.encode(texts, convert_to_tensor=True)
-        embeddings_np = embeddings.cpu().numpy()
-        
-        # Normalize embeddings for cosine similarity
-        faiss.normalize_L2(embeddings_np)
-        
-        # Create index
-        self.index = faiss.IndexFlatIP(self.embedding_dim)  # Inner product (cosine similarity)
-        self.index.add(embeddings_np)
-        
-        print(f"Built index with {len(chunks)} chunks")
-    
-    def retrieve_relevant_chunks(self, query: str, k: int = 5) -> List[Dict]:
-        """
-        Retrieve the k most relevant chunks for a query
-        
-        Args:
-            query: Query text
-            k: Number of chunks to retrieve
-            
-        Returns:
-            List of relevant chunks
-        """
-        if not self.index:
-            raise ValueError("Index not built! Call build_embedding_index first.")
-        
-        # Generate query embedding
-        query_embedding = self.model.encode([query], convert_to_tensor=True)
-        query_embedding_np = query_embedding.cpu().numpy()
-        
-        # Normalize query embedding
-        faiss.normalize_L2(query_embedding_np)
-        
-        # Search index
-        scores, indices = self.index.search(query_embedding_np, k=min(k, len(self.chunks)))
-        
-        # Return relevant chunks with scores
-        relevant_chunks = []
-        for i, idx in enumerate(indices[0]):
-            if idx < len(self.chunks):  # Safety check
-                chunk = self.chunks[idx].copy()
-                chunk["score"] = float(scores[0][i])
-                relevant_chunks.append(chunk)
-        
-        return relevant_chunks
-    
-    def process_question(self, question: str, options: List[str], max_pages: int = 5, top_k: int = 5) -> Dict:
-        """
-        Process a question by retrieving and chunking Wikipedia pages,
-        building an index, and retrieving relevant chunks
-        
-        Args:
-            question: Question text
-            options: List of answer options
-            max_pages: Maximum number of pages to retrieve
-            top_k: Number of chunks to retrieve per query
-            
-        Returns:
-            Dictionary with question, options, and relevant chunks
-        """
-        # Retrieve and chunk pages
-        chunks = self.retrieve_and_chunk_pages(question, options, max_pages)
-        
-        # Build index from chunks
-        self.build_embedding_index(chunks)
-        
-        # Create query for each option
-        option_queries = [f"{question} {opt}" for opt in options]
-        
-        # Get relevant chunks for each option
-        option_chunks = []
-        for query in option_queries:
-            relevant_chunks = self.retrieve_relevant_chunks(query, k=top_k)
-            option_chunks.append(relevant_chunks)
-        
-        return {
-            "question": question,
-            "options": options,
-            "option_chunks": option_chunks,
-            "all_chunks": chunks
-        }
+def create_combined_text(df):
+    """Combine question with metamap phrases for better context"""
+    # Check if metamap_phrases exists, otherwise use just the question
+    if 'metamap_phrases' in df.columns:
+        df['combined_text'] = df['question'] + " " + df['metamap_phrases'].fillna('')
+    else:
+        df['combined_text'] = df['question']
+    return df
 
-import numpy as np
-import torch
-from sentence_transformers import SentenceTransformer, util
-from typing import List, Dict, Tuple
+def generate_embeddings(texts, model_name="pritamdeka/BioBERT-base-finetuned-PubMedQA"):
+    """Generate embeddings using a biomedical language model"""
+    print(f"Generating embeddings using {model_name}...")
+    model = SentenceTransformer(model_name)
+    embeddings = model.encode(texts, show_progress_bar=True)
+    return embeddings
 
-class EmbeddingQuestionAnswerer:
-    def __init__(self, model_name: str = "sentence-transformers/all-MiniLM-L6-v2"):
-        """
-        Initialize the embedding-based question answerer
-        
-        Args:
-            model_name: HuggingFace model name for sentence embeddings
-        """
-        self.model = SentenceTransformer(model_name)
+def cluster_questions(embeddings, n_neighbors=15, min_cluster_size=10):
+    """Perform dimensionality reduction and clustering"""
+    print("Reducing dimensions with UMAP...")
+    umap_embeddings = umap.UMAP(
+        n_neighbors=n_neighbors,
+        min_dist=0.0,
+        metric='cosine',
+        random_state=42
+    ).fit_transform(embeddings)
     
-    def calculate_option_scores(self, 
-                               question: str,
-                               options: List[str],
-                               option_chunks: List[List[Dict]]) -> Tuple[np.ndarray, List[Dict]]:
-        """
-        Calculate scores for each answer option based on retrieved chunks
-        
-        Args:
-            question: Question text
-            options: List of answer options
-            option_chunks: List of relevant chunks for each option
-            
-        Returns:
-            Tuple of (scores_array, list_of_supporting_evidence)
-        """
-        option_scores = []
-        supporting_evidence = []
-        
-        for i, chunks in enumerate(option_chunks):
-            # Skip if no chunks retrieved
-            if not chunks:
-                option_scores.append(0)
-                supporting_evidence.append(None)
-                continue
-                
-            # Get option and combine with question
-            option = options[i]
-            option_query = f"{question} {option}"
-            
-            # Get chunk texts and scores
-            texts = [chunk["text"] for chunk in chunks]
-            retrieval_scores = np.array([chunk["score"] for chunk in chunks])
-            
-            # Calculate semantic similarity between option_query and each chunk
-            query_embedding = self.model.encode(option_query, convert_to_tensor=True)
-            chunk_embeddings = self.model.encode(texts, convert_to_tensor=True)
-            
-            # Calculate cosine similarities
-            similarities = util.pytorch_cos_sim(query_embedding, chunk_embeddings)[0].cpu().numpy()
-            
-            # Combine retrieval scores and semantic similarities
-            combined_scores = 0.5 * retrieval_scores + 0.5 * similarities
-            
-            # Find best supporting chunk
-            best_chunk_idx = np.argmax(combined_scores)
-            best_chunk = chunks[best_chunk_idx]
-            best_chunk["relevance_score"] = float(combined_scores[best_chunk_idx])
-            
-            # Store best evidence
-            supporting_evidence.append(best_chunk)
-            
-            # Aggregate scores (using weighted average)
-            option_score = np.sum(combined_scores) / len(chunks)
-            option_scores.append(float(option_score))
-        
-        return np.array(option_scores), supporting_evidence
+    print("Clustering with HDBSCAN...")
+    clusters = hdbscan.HDBSCAN(
+        min_cluster_size=min_cluster_size,
+        metric='euclidean',
+        gen_min_span_tree=True,
+        prediction_data=True
+    ).fit(umap_embeddings)
     
-    def answer_question(self, 
-                       question: str,
-                       options: List[str],
-                       option_chunks: List[List[Dict]]) -> Tuple[int, np.ndarray, Dict]:
-        """
-        Answer the question by scoring each option
-        
-        Args:
-            question: Question text
-            options: List of answer options
-            option_chunks: List of relevant chunks for each option
-            
-        Returns:
-            Tuple of (predicted_index, scores, evidence_dict)
-        """
-        # Calculate option scores and get supporting evidence
-        scores, evidence = self.calculate_option_scores(question, options, option_chunks)
-        
-        # Get predicted answer index
-        predicted_idx = np.argmax(scores)
-        
-        # Create evidence dictionary 
-        evidence_dict = {
-            "predicted_evidence": evidence[predicted_idx] if predicted_idx < len(evidence) else None,
-            "all_evidence": evidence,
-        }
-        
-        return predicted_idx, scores, evidence_dict
+    return umap_embeddings, clusters.labels_
 
-import argparse
-import os
-import time
-import json
-from tqdm import tqdm
+def apply_bertopic(df, embeddings):
+    """Use BERTopic to automatically extract topics from clusters"""
+    print("Extracting topics with BERTopic...")
+    
+    # Configure BERTopic
+    topic_model = BERTopic(
+        embedding_model=None,  # We've already created embeddings
+        nr_topics="auto",
+        verbose=True
+    )
+    
+    # Fit the model with pre-computed embeddings
+    topics, probs = topic_model.fit_transform(df['combined_text'].tolist(), embeddings)
+    
+    # Get topic info
+    topic_info = topic_model.get_topic_info()
+    
+    # Get representative terms for each topic
+    topic_terms = {}
+    for topic in topic_info['Topic'].values:
+        if topic != -1:  # Skip outlier topic
+            topic_terms[topic] = topic_model.get_topic(topic)
+    
+    return topics, topic_info, topic_terms
 
-from utils.data_loader import load_medqa_dataset, analyze_questions
-from utils.wiki_retriever import WikiEmbeddingRetriever
-from models.embedding_qa import EmbeddingQuestionAnswerer
+def visualize_clusters(umap_embeddings, cluster_labels, save_path="cluster_visualization.png"):
+    """Create a visualization of the clusters"""
+    plt.figure(figsize=(12, 10))
+    plt.scatter(
+        umap_embeddings[:, 0], 
+        umap_embeddings[:, 1], 
+        c=cluster_labels, 
+        cmap='hsv', 
+        s=5, 
+        alpha=0.8
+    )
+    plt.colorbar(label='Cluster')
+    plt.title('Question Clusters')
+    plt.tight_layout()
+    plt.savefig(save_path)
+    print(f"Visualization saved to {save_path}")
+
+def analyze_clusters(df, cluster_labels, topic_terms=None):
+    """Analyze clusters to understand categorization"""
+    df['cluster'] = cluster_labels
+    
+    # Count documents per cluster
+    cluster_counts = df['cluster'].value_counts().sort_index()
+    print("\nCluster distribution:")
+    print(cluster_counts)
+    
+    # Save categorized data
+    df_categorized = df[['question', 'metamap_phrases', 'cluster']]
+    df_categorized.to_csv('categorized_questions.csv', index=False)
+    print("Saved categorized questions to categorized_questions.csv")
+    
+    # If we have topic terms, create a mapping file
+    if topic_terms:
+        topic_mapping = []
+        for topic, terms in topic_terms.items():
+            # Create a description based on top terms
+            description = ", ".join([term[0] for term in terms[:5]])
+            topic_mapping.append({
+                'cluster_id': topic,
+                'top_terms': description,
+                'question_count': len(df[df['cluster'] == topic])
+            })
+        
+        pd.DataFrame(topic_mapping).to_csv('cluster_descriptions.csv', index=False)
+        print("Saved cluster descriptions to cluster_descriptions.csv")
+    
+    return df_categorized
 
 def main():
-    # Parse command line arguments
-    parser = argparse.ArgumentParser(description='Medical Question Answering System')
-    parser.add_argument('--subset', type=int, default=None,
-                        help='Number of questions to evaluate (default: all)')
-    parser.add_argument('--analyze', action='store_true', 
-                        help='Perform dataset analysis only')
-    parser.add_argument('--verbose', action='store_true',
-                        help='Print detailed output during evaluation')
-    parser.add_argument('--model', type=str, default="sentence-transformers/all-MiniLM-L6-v2",
-                        help='Embedding model to use')
-    args = parser.parse_args()
+    # Load dataset
+    df = load_medqa_dataset()
     
-    # Load the dataset
-    print(f"Loading dataset{' (subset: ' + str(args.subset) + ')' if args.subset else ''}...")
-    dataset = load_medqa_dataset(subset_size=args.subset)
-    print(f"Loaded {len(dataset)} questions.")
+    # Prepare text
+    df = create_combined_text(df)
     
-    # If analyze flag is set, perform analysis and exit
-    if args.analyze:
-        print("Analyzing dataset...")
-        analysis = analyze_questions(dataset)
-        print("\nAnalysis Results:")
-        for key, value in analysis.items():
-            print(f"{key}: {value}")
-        return
+    # Generate embeddings
+    embeddings = generate_embeddings(df['combined_text'].tolist())
     
-    # Initialize components
-    wiki_retriever = WikiEmbeddingRetriever(model_name=args.model)
-    qa_model = EmbeddingQuestionAnswerer(model_name=args.model)
+    # Cluster the questions
+    umap_embeddings, cluster_labels = cluster_questions(embeddings)
     
-    # Process questions
-    correct_count = 0
-    results = []
+    # Extract topics
+    topics, topic_info, topic_terms = apply_bertopic(df, embeddings)
     
-    print("Starting question answering...")
-    for i, row in tqdm(dataset.iterrows(), total=len(dataset)):
-        question = row['question']
-        options = [row['options']['A'], row['options']['B'], 
-                  row['options']['C'], row['options']['D']]
-        correct_idx = row['answer_idx']
-        
-        if args.verbose:
-            print(f"\nQuestion {i+1}: {question}")
-            print(f"Options: {options}")
-            print(f"Correct answer: {options[correct_idx]} (index: {correct_idx})")
-        
-        # Process question through RAG pipeline
-        question_data = wiki_retriever.process_question(question, options)
-        
-        # Answer the question
-        predicted_idx, scores, evidence = qa_model.answer_question(
-            question, 
-            options, 
-            question_data["option_chunks"]
-        )
-        
-        # Check if prediction is correct
-        is_correct = (predicted_idx == correct_idx)
-        if is_correct:
-            correct_count += 1
-            
-        if args.verbose:
-            print(f"Predicted answer: {options[predicted_idx]} (index: {predicted_idx})")
-            print(f"Scores: {scores}")
-            print(f"Correct: {is_correct}")
-            
-            # Display supporting evidence
-            if evidence["predicted_evidence"]:
-                print("\nSupporting evidence:")
-                print(f"Source: {evidence['predicted_evidence']['source']}")
-                print(f"Relevance score: {evidence['predicted_evidence']['relevance_score']:.4f}")
-                print(f"Text snippet: \"{evidence['predicted_evidence']['text'][:300]}...\"")
-        
-        # Store results with evidence
-        results.append({
-            "question": question,
-            "options": options,
-            "correct_idx": int(correct_idx),
-            "predicted_idx": int(predicted_idx),
-            "scores": scores.tolist(),
-            "is_correct": bool(is_correct),
-            "evidence": {
-                "source": evidence["predicted_evidence"]["source"] if evidence["predicted_evidence"] else None,
-                "text": evidence["predicted_evidence"]["text"][:500] if evidence["predicted_evidence"] else None,
-                "relevance_score": evidence["predicted_evidence"]["relevance_score"] if evidence["predicted_evidence"] else None
-            }
-        })
+    # Visualize results
+    visualize_clusters(umap_embeddings, cluster_labels)
     
-    # Calculate accuracy
-    accuracy = correct_count / len(dataset)
-    print(f"\nEvaluation Results:")
-    print(f"Total questions: {len(dataset)}")
-    print(f"Correctly answered: {correct_count}")
-    print(f"Accuracy: {accuracy:.4f} ({correct_count}/{len(dataset)})")
+    # Analyze and save results
+    df_categorized = analyze_clusters(df, topics, topic_terms)
     
-    # Save results
-    os.makedirs("results", exist_ok=True)
-    with open("results/qa_results.json", "w") as f:
-        json.dump({
-            "accuracy": accuracy,
-            "correct_count": correct_count,
-            "total_questions": len(dataset),
-            "model": args.model,
-            "results": results
-        }, f)
+    print("\nCategorization complete!")
+    print(f"Found {len(set(topics)) - (1 if -1 in topics else 0)} distinct question categories")
 
 if __name__ == "__main__":
     main()
